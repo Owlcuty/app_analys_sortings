@@ -1,0 +1,14 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/usr/CLionProjects/MyFuture/Analys_sorts/main.cpp
+stdio.h
+-
+SDL2/SDL.h
+/home/usr/CLionProjects/MyFuture/Analys_sorts/SDL2/SDL.h
+

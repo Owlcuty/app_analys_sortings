@@ -1,0 +1,3 @@
+ToolSet: 1.0 (local)Options: 
+
+Options:-DCMAKE_INSTALL_PREFIX=~/Downloads/SFML-2.5.1-Compiled

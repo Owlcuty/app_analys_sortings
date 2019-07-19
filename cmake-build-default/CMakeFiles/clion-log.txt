@@ -1,0 +1,4 @@
+/opt/clion-2019.1.4/bin/cmake/linux/bin/cmake -DCMAKE_BUILD_TYPE= -G "CodeBlocks - Unix Makefiles" /home/usr/CLionProjects/MyFuture/Analys_sorts
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /home/usr/CLionProjects/MyFuture/Analys_sorts/cmake-build-default

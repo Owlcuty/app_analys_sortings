@@ -102,7 +102,7 @@ struct Graph {
 };
 
 void copy_array(int ar1[], int ar2[], int n) {
-    assert(n <= sizeof(ar1) && n <= sizeof(ar2));
+    assert(0 < n && n <= NMAX);
 
     for (int i = 0; i < n; i++) {
         ar1[i] = ar2[i];
@@ -110,7 +110,7 @@ void copy_array(int ar1[], int ar2[], int n) {
 }
 
 void rand_array(int nmax, int array[]) {
-    assert(nmax <= sizeof(array));
+    assert(0 < nmax && nmax <= NMAX);
 
     for (int i = 0; i < nmax; i++) {
         array[i] = rand();
@@ -118,7 +118,7 @@ void rand_array(int nmax, int array[]) {
 }
 
 void bubble_sort(int array[], int permutations[], int comparisons[], int num_elem) {
-    assert(num_elem <= sizeof(array));
+    assert(0 < num_elem && num_elem <= NMAX);
 
     int t = -1;
     for (int i = 0; i < num_elem; i++) {
@@ -135,7 +135,7 @@ void bubble_sort(int array[], int permutations[], int comparisons[], int num_ele
 }
 
 void selection_sort(int array[], int permutations[], int comparisons[], int num_elem) {
-    assert(num_elem <= sizeof(array));
+    assert(0 < num_elem && num_elem <= NMAX);
 
     int mn = array[0], ind_mn = 0;
     for (int i = 0; i < num_elem; i++) {
@@ -274,7 +274,7 @@ void Graph::draw_graph(sf::RenderWindow *window, const bool choose[]) {
 }
 
 void draw_buttons(Button buttons[], int num_of_elems, sf::RenderWindow* window) {
-    assert(num_of_elems <= sizeof(buttons));
+    assert(0 < num_of_elems && num_of_elems <= NMAX);
 
     for (int i = 0; i < num_of_elems; i ++) {
         buttons[i].draw_button(window);

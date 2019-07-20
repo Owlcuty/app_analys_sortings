@@ -1,439 +1,496 @@
-#define BUBBLE 0
-#define SELECTION 1
-#define HEAP 2
-#define MERGE 3
-
 #include <SFML/Graphics.hpp>
 #include <assert.h>
 #include <cmath>
+#include <stdio.h>
 
-namespace kku {
+const int Kinds_sortings = 4;
+const int Kinds_fillings = 1;
 
-    const int Kinds_sortings = 4;
-    const int Kinds_fillings = 1;
-    const int Start_x = 50;
-    const int Start_y = 460;
-    const int Finish_x = 470;
-    const int Finish_y = 30;
+const int BUBBLE = 0, SELECTION = 1, HEAP = 2, MERGE = 3;
 
-    void copy_array(int ar1[], int ar2[], int n) {
-        for (int i = 0; i < n; i ++) {
-            ar1[i] = ar2[i];
-        }
-    }
+const sf::Color BACKGROUND_COL = sf::Color(230, 230, 230);
+const sf::Color INACT_BUT_CIRCUIT = sf::Color(140, 140, 140);
+//const sf::Color ACT_BUT_CIRCUIT = sf::Color::Green;
+const sf::Color BUT_FILL = sf::Color(245, 245, 245);
+const int OUTLINE_SIZE = 3;
+const int THIN_OUTLINE_SIZE = 2;
 
-    void rand_array(int nmax, int array[]) {
-        for (int i = 0; i < nmax; i ++) {
-            array[i] = rand();
-        }
-    }
+const sf::Color TEXT_COL = sf::Color::Black;
+const sf::Color GRAPH_TEXT_COL = sf::Color::White;
+const sf::Color WARNING_TEXT_COL = sf::Color::Red;
+const int TEXT_SIZE = 18;
+const int WARNING_TEXT_SIZE = 20;
+const int NUM_SIZE = 16;
 
-    void bubble_sort(int array[], int permutations[], int comparisons[], int num_elem) {
-        int t = -1;
-        for (int i = 0; i < num_elem; i ++) {
-            for (int j = i + 1; j < num_elem; j ++) {
-                comparisons[num_elem] ++;
-                if (array[j] < array[i]) {
-                    t = array[j];
-                    array[j] = array[i];
-                    array[i] = t;
-                    permutations[num_elem] ++;
-                }
-            }
-        }
-    }
-    void selection_sort(int array[], int permutations[], int comparisons[], int num_elem) {
-        int mn = array[0], ind_mn = 0;
-        for (int i = 0; i < num_elem; i ++) {
-            for (int j = i + 1; j < num_elem; j ++) {
-                comparisons[num_elem] ++;
-                if (array[j] < mn) {
-                    mn = array[j];
-                    ind_mn = j;
-                }
-            }
-            array[ind_mn] = array[i];
-            array[i] = mn;
-            permutations[num_elem] ++;
-        }
-    }
-    void heap_sort(int array[], int permutations[], int comparisons[], int num_elem) {
+const std::string BUBBLE_S = "Bubble sort",
+                  SELECTION_S = "Selection sort",
+                  HEAP_S = "Heap sort",
+                  MERGE_S = "Merge Sort";
 
-    }
-    void merge_sort(int array[], int permutations[], int comparisons[], int num_elem) {
+const std::string RAND_F = "Random";
 
-    }
+const sf::Color GRAPH_BACK = sf::Color::Black;
+const sf::Color FUNC_GRAPH_COL[Kinds_sortings] = {sf::Color::Green,
+                                              sf::Color::Red,
+                                              sf::Color::Blue,
+                                              sf::Color(255, 102, 0)};
 
+const int NMAX = 1500;
 
-    void is_active(sf::RectangleShape* button, bool active) {
-        button->setOutlineColor((active) ? sf::Color::Green : sf::Color(140, 140, 140));
-    }
+struct Size {
+    int x, y;
+};
 
+const Size BUT_SIZE = {160, 30};
 
-    bool check_border(sf::RectangleShape border, sf::RenderWindow* window) {
-        return (border.getPosition().x <= sf::Mouse::getPosition(*window).x
-                && sf::Mouse::getPosition(*window).x <= border.getPosition().x + border.getSize().x
-                && border.getPosition().y <= sf::Mouse::getPosition(*window).y
-                && sf::Mouse::getPosition(*window).y <= border.getPosition().y + border.getSize().y);
-    }
+struct Text {
+    int x, y;
+    std::string write;
+    sf::Font font;
+    sf::Color color;
+    int char_size;
 
-    void edit_text(sf::Text* text, std::string write, sf::Font* font) {
-        text->setFont(*font);
-        text->setString(write);
-        text->setColor(sf::Color::Black);
-        text->setCharacterSize(18);
-    }
+    int angle = 0;
+    void draw_text(sf::RenderWindow *window);
+};
 
-    void edit_warning_text(sf::Text* text, std::string write, sf::Font *font) {
-        text->setFont(*font);
-        text->setString(write);
-        text->setColor(sf::Color::Red);
-        text->setCharacterSize(22);
-    }
+struct Button {
+    int x, y;
+    Size size;
+    sf::Color fill;
 
-    void edit_arr_texts(int cnt_of_elements, sf::Text text[], std::string write[], sf::Font* font) {
-        for (int i = 0; i < cnt_of_elements; i++) {
-            edit_text(&text[i], write[i], font);
-        }
-    }
+    int out_size;
+    std::string text;
 
-    void edit_button(sf::RectangleShape* but) {
-        but->setFillColor(sf::Color(245, 245, 245));
-        but->setOutlineThickness(3);
-        but->setOutlineColor(sf::Color(140, 140, 140));
-        but->setSize(sf::Vector2f(160, 30));
-    }
+    sf::Font font;
 
-    void build_counter(sf::RectangleShape counter[]) {
-        for (int i = 0; i < 3; i ++) {
-            counter[i].setFillColor(sf::Color(240, 240, 240));
-            counter[i].setOutlineThickness(2);
-            counter[i].setOutlineColor(sf::Color(140, 140, 140));
-            counter[i].setSize(sf::Vector2f(25, 30));
-        }
-        counter[1].setSize(sf::Vector2f(200, 30));
-        counter[1].setOutlineColor(sf::Color(140, 140, 140));
-    }
+    int number;
+    bool is_active = false;
 
-    std::string reverse_string(std::string str) {
-        std::string sec_str = "";
-        for (int i = str.length() - 1; i >= 0; i --) {
-            sec_str += str[i];
-        }
-        return sec_str;
-    }
+    sf::Color out = (is_active) ? FUNC_GRAPH_COL[number] : INACT_BUT_CIRCUIT;
 
-    std::string to_string(int n) {
-        if (!n)
-            return "0";
-        std::string n_str = "";
-        while (n > 0) {
-            n_str += (n % 10) + '0';
-            n /= 10;
-        }
-        return reverse_string(n_str);
+    Text fill_text = {x + 10, y + 3, text, font, TEXT_COL, TEXT_SIZE};
+    sf::Vector2f vect_size = sf::Vector2f(size.x, size.y);
+
+    void draw_button(sf::RenderWindow *window);
+};
+
+//struct Cursor {
+//    sf::Sprite form;
+//    sf::Texture texture;
+//
+//    bool is_pointer = false;
+//
+//    void show(sf::RenderWindow* window);
+//};
+
+struct Graph {
+    sf::Vector2f left_top;
+
+    std::string title,
+                xlab,
+                ylab;
+
+    sf::Font font;
+
+    int number;
+
+    sf::Vector2f points[Kinds_sortings][NMAX];
+
+    void draw_graph(sf::RenderWindow* window, const bool choose[]);
+    void build_func_graphs(const bool* choose);
+};
+
+void copy_array(int ar1[], int ar2[], int n) {
+    assert(n <= sizeof(ar1) && n <= sizeof(ar2));
+
+    for (int i = 0; i < n; i++) {
+        ar1[i] = ar2[i];
     }
 }
 
+void rand_array(int nmax, int array[]) {
+    assert(nmax <= sizeof(array));
+
+    for (int i = 0; i < nmax; i++) {
+        array[i] = rand();
+    }
+}
+
+void bubble_sort(int array[], int permutations[], int comparisons[], int num_elem) {
+    assert(num_elem <= sizeof(array));
+
+    int t = -1;
+    for (int i = 0; i < num_elem; i++) {
+        for (int j = i + 1; j < num_elem; j++) {
+            comparisons[num_elem]++;
+            if (array[j] < array[i]) {
+                t = array[j];
+                array[j] = array[i];
+                array[i] = t;
+                permutations[num_elem]++;
+            }
+        }
+    }
+}
+
+void selection_sort(int array[], int permutations[], int comparisons[], int num_elem) {
+    assert(num_elem <= sizeof(array));
+
+    int mn = array[0], ind_mn = 0;
+    for (int i = 0; i < num_elem; i++) {
+        for (int j = i + 1; j < num_elem; j++) {
+            comparisons[num_elem]++;
+            if (array[j] < mn) {
+                mn = array[j];
+                ind_mn = j;
+            }
+        }
+        array[ind_mn] = array[i];
+        array[i] = mn;
+        permutations[num_elem]++;
+    }
+
+}
+
+void heap_sort(int array[], int permutations[], int comparisons[], int num_elem) {
+
+}
+
+void merge_sort(int array[], int permutations[], int comparisons[], int num_elem) {
+
+}
+
+bool check_border(const Button& border, sf::RenderWindow *window) {
+    return (border.x <= sf::Mouse::getPosition(*window).x
+            && sf::Mouse::getPosition(*window).x <= border.x + border.size.x
+            && border.y <= sf::Mouse::getPosition(*window).y
+            && sf::Mouse::getPosition(*window).y <= border.y + border.size.y);
+}
+
+//std::string reverse_string(std::string str) {
+//    std::string sec_str;
+//    for (int i = str.length() - 1; i >= 0; i--) {
+//        sec_str += str[i];
+//    }
+//    return sec_str;
+//}
+
+//std::string to_string(int n) {
+//    if (!n)
+//        return "0";
+//    std::string n_str;
+//    while (n > 0) {
+//        n_str += (n % 10) + '0';
+//        n /= 10;
+//    }
+//    return reverse_string(n_str);
+//}
+
+void Text::draw_text(sf::RenderWindow* window) {
+    assert(typeid(write) == typeid(std::string));
+    assert(x >= 0 && x < sf::VideoMode::getDesktopMode().width);
+    assert(y >= 0 && y < sf::VideoMode::getDesktopMode().height);
+    assert(char_size > 10 && char_size < 36);
+
+    sf::Text text;
+
+    text.setFont(font);
+    text.setString(write);
+    text.setFillColor(color);
+    text.setCharacterSize(char_size);
+    text.setPosition(x, y);
+    text.rotate(angle);
+
+    window->draw(text);
+}
+
+void Button::draw_button(sf::RenderWindow* window) {
+    assert(x >= 0 && x < sf::VideoMode::getDesktopMode().width);
+    assert(y >= 0 && y < sf::VideoMode::getDesktopMode().height);
+
+    sf::RectangleShape shape;
+    out = (is_active) ? FUNC_GRAPH_COL[number] : INACT_BUT_CIRCUIT;
+
+    shape.setPosition(x, y);
+    shape.setSize(vect_size);
+    shape.setFillColor(fill);
+    shape.setOutlineColor(out);
+    shape.setOutlineThickness(out_size);
+
+    window->draw(shape);
+    fill_text.draw_text(window);
+}
+
+void Graph::draw_graph(sf::RenderWindow *window, const bool choose[]) {
+    assert(left_top.x >= 0 && left_top.x < sf::VideoMode::getDesktopMode().width - 301);
+    assert(left_top.y >= 0 && left_top.y < sf::VideoMode::getDesktopMode().height - 402);
+
+    sf::RectangleShape back;
+    back.setPosition(left_top);
+    back.setSize(sf::Vector2f(301, 402));
+
+    Text zero = {static_cast<int>(left_top.x - 12), static_cast<int>(left_top.y + 405), "0",
+                 font, TEXT_COL, NUM_SIZE},
+         xmax = {static_cast<int>(left_top.x + 290), static_cast<int>(left_top.y + 405), "1500",
+                 font, TEXT_COL, NUM_SIZE},
+         ymax = {static_cast<int>(left_top.x - ((number == 1) ? 40 : 65)), static_cast<int>(left_top.y), (number == 1) ? "4210" : "2000000",
+                 font, TEXT_COL, NUM_SIZE},
+         xmid = {static_cast<int>(left_top.x + 145), static_cast<int>(left_top.y + 405), "750",
+                 font, TEXT_COL, NUM_SIZE},
+         ymid = {static_cast<int>(left_top.x - ((number == 1) ? 40 : 65)), static_cast<int>(left_top.y + 200), (number == 1) ? "2105" : "1000000",
+                 font, TEXT_COL, NUM_SIZE};
+
+    back.setFillColor(GRAPH_BACK);
+
+    Text title_text = {static_cast<int>(left_top.x - 50), static_cast<int>(left_top.y - 40), title, font,
+                       TEXT_COL, TEXT_SIZE},
+         xlab_text =  {static_cast<int>(left_top.x + 50), static_cast<int>(left_top.y + 420), xlab, font,
+                       TEXT_COL, TEXT_SIZE},
+         ylab_text =  {static_cast<int>(left_top.x - 90), static_cast<int>(left_top.y + 280), ylab, font,
+                       TEXT_COL, TEXT_SIZE, -90};
+
+    window->draw(back);
+    title_text.draw_text(window);
+    xlab_text.draw_text(window);
+    ylab_text.draw_text(window);
+    zero.draw_text(window);
+    xmax.draw_text(window);
+    ymax.draw_text(window);
+    xmid.draw_text(window);
+    ymid.draw_text(window);
+
+    sf::CircleShape circleShape;
+
+    for (int type = 0; type < Kinds_sortings; type ++) {
+        for (auto point : points[type]) {
+            if (!choose[type] || point.x >= left_top.x + 300 || point.y <= left_top.y) continue;
+            circleShape.setRadius(1);
+            circleShape.setPosition(point);
+            circleShape.setFillColor(FUNC_GRAPH_COL[type]);
+            window->draw(circleShape);
+        }
+    }
+}
+
+void draw_buttons(Button buttons[], int num_of_elems, sf::RenderWindow* window) {
+    assert(num_of_elems <= sizeof(buttons));
+
+    for (int i = 0; i < num_of_elems; i ++) {
+        buttons[i].draw_button(window);
+    }
+}
+
+bool is_clicked(sf::Clock clock) {
+    return (sf::Mouse::isButtonPressed(sf::Mouse::Left) && clock.getElapsedTime().asMilliseconds() > 200);
+}
+
+//void Cursor::show(sf::RenderWindow *window) {
+//    window->setMouseCursorVisible(!is_pointer);
+//}
+
+void Graph::build_func_graphs(const bool choose[Kinds_sortings]) {
+    int arr[NMAX] = {};
+    rand_array(NMAX, arr);
+    int copy_of_arr[NMAX];
+
+    for (int type = 0; type < Kinds_sortings; type ++) {
+        if (!choose[type]) continue;
+        int coms[NMAX] = {};
+        int perms[NMAX] = {};
+
+        for (int n = 0; n < NMAX; n ++) {
+            copy_array(copy_of_arr, arr, n);
+            switch (type) {
+                case BUBBLE:
+                    bubble_sort(copy_of_arr, perms, coms, n);
+                    break;
+                case SELECTION:
+                    selection_sort(copy_of_arr, perms, coms, n);
+                    break;
+                case HEAP:
+                    heap_sort(copy_of_arr, perms, coms, n);
+                    break;
+                case MERGE:
+                    merge_sort(copy_of_arr, perms, coms, n);
+                    break;
+                default:
+                    break;
+            }
+        }
+        for (int i = 0; i < NMAX; i ++) {
+            points[type][i] = sf::Vector2f(i * 0.1992 + ((number == 1) ? 300 : 820),
+                    650 - ((number == 1) ? perms[i] * 0.095 : coms[i] * 0.0002));
+
+            if (i < 120) printf("%i sorting, %i num: %i, %i \n", type, i, perms[i], coms[i]);
+        }
+
+    }
+
+}
+
+void build_app(sf::RenderWindow* window, sf::RenderWindow* warning_window, Button sort_buttons[], Button fill_buttons[], Button* next_but,
+        int ready[], bool choose[][std::max(Kinds_fillings, Kinds_sortings)],
+        Text* brief, Text* choose_sort, Text* choose_fill, Text* warning, bool* is_warning, sf::View fixed,
+        Graph* graph1, Graph* graph2) {
+    sf::Clock clock;
+    bool is_necessary = true;
+
+    while (window->isOpen()) {
+        sf::Event event{};
+        while (window->pollEvent(event)) {
+            if (event.type == sf::Event::Closed ||
+                (event.type == sf::Event::KeyReleased && event.key.code == sf::Keyboard::Escape))
+                window->close();
+        }
+
+        while (warning_window->pollEvent(event)) {
+            if (event.type == sf::Event::Closed ||
+                (event.type == sf::Event::KeyReleased && event.key.code == sf::Keyboard::Escape)) {
+                is_necessary = false;
+                warning_window->close();
+            }
+        }
+
+        //cursor->form.setPosition(sf::Mouse::getPosition(*window).x - 7, sf::Mouse::getPosition(*window).y - 4);
+        //cursor->is_pointer = false;
+
+        for (int i = 0; i < Kinds_sortings; i++) {
+            if (check_border(sort_buttons[i], window)) {
+                //cursor->is_pointer = true;
+                if (is_clicked(clock)) {
+                    clock.restart();
+                    choose[0][i] = (!choose[0][i]);
+                    ready[0] += (choose[0][i]) ? 1 : -1;
+                    sort_buttons[i].is_active = choose[0][i];
+                }
+            }
+        }
+        if (check_border(fill_buttons[0], window)) {
+//            cursor->is_pointer = true;
+            if (is_clicked(clock)) {
+                clock.restart();
+                ready[1] = 1 - ready[1];
+                fill_buttons[0].is_active = ready[1];
+            }
+        }
+
+        if (check_border(*next_but, window)) {
+//            cursor->is_pointer = true;
+            if (is_clicked(clock)) {
+                clock.restart();
+                if (ready[0] && ready[1]) {
+                    *is_warning = false;
+                    graph1->build_func_graphs(choose[0]);
+                    graph2->build_func_graphs(choose[0]);
+                } else {
+                    *is_warning = true;
+                    is_necessary = true;
+                    std::string warn;
+                    if (ready[0]) warn = "\tYou didn't chose the kind of filling arrays";
+                    else if (ready[1]) warn = "\tYou didn't chose the kind of sortings";
+                    else warn = "You didn't chose the kinds of sortings and filling arrays";
+                    warning->write = warn;
+                }
+            }
+        }
+
+//        cursor->show(window);
+
+
+        window->clear(BACKGROUND_COL);
+        window->setView(fixed);
+
+        brief->draw_text(window);
+        choose_sort->draw_text(window);
+
+        draw_buttons(sort_buttons, Kinds_sortings, window);
+
+        choose_fill->draw_text(window);
+
+        draw_buttons(fill_buttons, Kinds_fillings, window);
+
+        next_but->draw_button(window);
+
+        graph1->draw_graph(window, choose[0]);
+        graph2->draw_graph(window, choose[0]);
+
+//        if (cursor->is_pointer)
+//            window->draw(cursor->form);
+        window->display();
+
+        if (*is_warning)
+        {
+            if (!warning_window->isOpen() && is_necessary) warning_window->create(sf::VideoMode(600, 100), "Warning!");
+            warning_window->clear(sf::Color::White);
+            warning->draw_text(warning_window);
+            warning_window->display();
+        }
+    }
+
+}
+
 int main() {
-    sf::RenderWindow window(sf::VideoMode(sf::VideoMode::getDesktopMode().width, sf::VideoMode::getDesktopMode().height),
-            "Analys sortings");
-    sf::RenderWindow graph1; //"Dependence of the number of permutations from N"
-    sf::RenderWindow graph2; //"Dependence of the number of comparisons from N"
+
+    freopen("../output.out", "w", stdout);
+
+    sf::RenderWindow window(
+            sf::VideoMode(sf::VideoMode::getDesktopMode().width, sf::VideoMode::getDesktopMode().height),
+            "Analysis sortings");
+    sf::RenderWindow warning_window;
 
     sf::View fixed = window.getView();
-    sf::Texture texture_pointer;
-    texture_pointer.loadFromFile("../pointer.png");
-
-    sf::Sprite pointer(texture_pointer);
+//    Cursor cursor;
+//    cursor.texture.loadFromFile("../pointer.png");
+//    cursor.form.setTexture(cursor.texture);
 
     sf::Font font;
 
     if (!font.loadFromFile("../Roboto-Regular.ttf"))
         return 1;
 
-    sf::Text brief;
+    Text brief = {20, 35, "There's you can analys sortings. Choose the kind of sortings and the kind of fillings.",
+                  font, TEXT_COL, TEXT_SIZE};
 
-    kku::edit_text(&brief,
-                   "\n\t" "There's you can analys sortings. Choose the kind of sortings and the kind of fillings",
-                   &font);
+    Text choose_sort = {20, 65, "Kinds of sortings:", font, TEXT_COL, TEXT_SIZE};
 
-    sf::Text choose_sort;
+    Button sort_buttons[4] = {{ 30, 100, BUT_SIZE, BUT_FILL, OUTLINE_SIZE, BUBBLE_S,    font, BUBBLE},
+                              {230, 100, BUT_SIZE, BUT_FILL, OUTLINE_SIZE, SELECTION_S, font, SELECTION},
+                              {430, 100, BUT_SIZE, BUT_FILL, OUTLINE_SIZE, HEAP_S,      font, HEAP},
+                              {630, 100, BUT_SIZE, BUT_FILL, OUTLINE_SIZE, MERGE_S,     font, MERGE}};
 
-    kku::edit_text(&choose_sort, "\n\t" "Kinds of sortings:", &font);
-    choose_sort.setPosition(brief.getPosition().x, brief.getPosition().y + 40);
+    Text choose_fill = {20, 150, "Choose the filling of array for sorting:", font, TEXT_COL, TEXT_SIZE};
 
-    sf::Text names_of_sortings[kku::Kinds_sortings];
-    std::string names_sorts[kku::Kinds_sortings] = {"Bubble Sort", "Selection Sort", "Heap Sort", "Merge Sort"};
+    Button fill_buttons[1] = {{30, 200, BUT_SIZE, BUT_FILL, OUTLINE_SIZE, RAND_F, font, 0}};
 
-    kku::edit_arr_texts(kku::Kinds_sortings, names_of_sortings, names_sorts, &font);
+    Button next_but = {static_cast<int>(sf::VideoMode::getDesktopMode().width - 200),
+                       static_cast<int>(sf::VideoMode::getDesktopMode().height - 120),
+                       BUT_SIZE, BUT_FILL, OUTLINE_SIZE, "Start", font, 0};
 
-    sf::RectangleShape sort_buttons[kku::Kinds_sortings];
+    Text warning = {50, 40, "", font, WARNING_TEXT_COL, WARNING_TEXT_SIZE};
 
-    for (int i = 0; i < kku::Kinds_sortings; i++) {
-        kku::edit_button(&sort_buttons[i]);
-        sort_buttons[i].setPosition(20 + 200 * i, 100);
-        names_of_sortings[i].setPosition(sort_buttons[i].getPosition().x + 10, sort_buttons[i].getPosition().y + 3);
-    }
-
-    sf::Text choose_fill;
-
-    kku::edit_text(&choose_fill, "Choose the filling of array for sorting:", &font);
-    choose_fill.setPosition(30, sort_buttons[0].getPosition().y + 50);
-
-    sf::RectangleShape fill_button;
-
-    kku::edit_button(&fill_button);
-    fill_button.setPosition(20, choose_fill.getPosition().y + 50);
-
-    sf::Text name_random_fill;
-
-    kku::edit_text(&name_random_fill, "Random", &font);
-    name_random_fill.setPosition(30, fill_button.getPosition().y + 3);
-
-    sf::Text input_nmax;
-
-    kku::edit_text(&input_nmax, "Max number of array's size:", &font);
-    input_nmax.setPosition(30, fill_button.getPosition().y + 50);
-
-    sf::RectangleShape cnt_nmax[3];
-
-    kku::build_counter(cnt_nmax);
-    for (int i = 0; i < 3; i ++) {
-        cnt_nmax[i].setPosition(i ? cnt_nmax[i - 1].getPosition().x + cnt_nmax[i - 1].getSize().x + 10 : 20,
-                input_nmax.getPosition().y + 50);
-    }
-
-    int nmax = 0;
-    sf::Text text_cnt_nmax[3];
-    std::string str_cnt_max[3] = {"-", kku::to_string(nmax), "+"};
-
-    kku::edit_arr_texts(3, text_cnt_nmax, str_cnt_max, &font);
-    for (int i = 0; i < 3; i += 2) {
-        text_cnt_nmax[i].setPosition(cnt_nmax[i].getPosition().x + 8, cnt_nmax[i].getPosition().y + 3);
-    }
-    text_cnt_nmax[1].setPosition(cnt_nmax[1].getPosition().x
-                              + (cnt_nmax[1].getPosition().x + cnt_nmax[1].getSize().x) / 2 - 8 * str_cnt_max[1].length(),
-                                 cnt_nmax[1].getPosition().y + 3);
-
-
-    sf::RectangleShape next_but;
-
-    kku::edit_button(&next_but);
-    next_but.setPosition(window.getSize().x - 150, window.getSize().y - 80);
-    next_but.setSize(sf::Vector2f(100, 30));
-
-    sf::Text next;
-
-    kku::edit_text(&next, "Analys", &font);
-    next.setPosition(next_but.getPosition().x + 10, next_but.getPosition().y + 3);
-
-    sf::Text warning;
-    warning.setPosition(30, window.getSize().y - 80);
-
-    bool ready[2] = {};
-    int choose[2] = {};
-    bool point = false;
-    bool create_graphs = false;
+    int ready[2] = {};
+    bool choose[2][std::max(Kinds_sortings, Kinds_fillings)] = {};
     bool is_warning = false;
-    int permutations[100000] = {}, comparisons[100000] = {};
-    int array_for_sort[100000] = {};
-    int array_for_copy[100000] = {};
+    sf::CircleShape circleShapes[Kinds_sortings][NMAX];
 
-    sf::Vertex xy[4] = {
-            sf::Vertex(sf::Vector2f(kku::Start_x, kku::Finish_y)),
-            sf::Vertex(sf::Vector2f(kku::Start_x, kku::Start_y)),
-            sf::Vertex(sf::Vector2f(kku::Start_x, kku::Start_y)),
-            sf::Vertex(sf::Vector2f(kku::Finish_x, kku::Start_y))
-    };
-
-    sf::Vertex perms[100000] = {};
-    sf::Vertex comps[100000] = {};
-
-    perms[0] = sf::Vertex(sf::Vector2f(kku::Start_x, kku::Start_y));
-    comps[0] = sf::Vertex(sf::Vector2f(kku::Start_x, kku::Start_y));
-
-    sf::Text x_brief, y1_brief, y2_brief;
-
-    kku::edit_text(&x_brief, "Number of elements", &font);
-    kku::edit_text(&y1_brief, "Number of permutaions", &font);
-    kku::edit_text(&y2_brief, "Number of comparisons", &font);
-    x_brief.setColor(sf::Color::White);
-    y1_brief.setColor(sf::Color::White);
-    y2_brief.setColor(sf::Color::White);
-    x_brief.setPosition(150, kku::Start_y + 10);
-    y1_brief.setPosition(kku::Start_x - 30, kku::Start_y - 130);
-    y1_brief.rotate(-90);
-    y2_brief.setPosition(kku::Start_x - 30, kku::Start_y - 130);
-    y2_brief.rotate(-90);
-
-    sf::Clock clock;
-
-    while (window.isOpen()) {
-        sf::Event event;
-        while (window.pollEvent(event)) {
-            if (event.type == sf::Event::Closed || (event.type == sf::Event::KeyReleased && event.key.code == sf::Keyboard::Escape))
-                window.close();
+    for (auto & circleShape : circleShapes) {
+        for (auto & i : circleShape) {
+            i = sf::CircleShape(10);
         }
-        while (graph1.pollEvent(event)) {
-            if (event.type == sf::Event::Closed || (event.type == sf::Event::KeyReleased && event.key.code == sf::Keyboard::Escape))
-                graph1.close();
-        }
-        while (graph2.pollEvent(event)) {
-            if (event.type == sf::Event::Closed || (event.type == sf::Event::KeyReleased && event.key.code == sf::Keyboard::Escape))
-                graph2.close();
-        }
-
-        pointer.setPosition(sf::Mouse::getPosition(window).x - 7, sf::Mouse::getPosition(window).y - 4);
-        point = false;
-
-        for (int i = 0; i < kku::Kinds_sortings; i++) {
-            if (kku::check_border(sort_buttons[i], &window)) {
-                window.setMouseCursorVisible(false);
-                point = true;
-                if (sf::Mouse::isButtonPressed(sf::Mouse::Left) && clock.getElapsedTime().asMilliseconds() > 200) {
-                    clock.restart();
-                    for (int j = 0; j < kku::Kinds_sortings; j ++) {
-                        kku::is_active(&sort_buttons[j], (i == j && choose[0] != i));
-                    }
-                    ready[0] = choose[0] != i;
-                    choose[0] = (choose[0] != i) ? i : -1;
-                }
-            }
-        }
-        if (kku::check_border(fill_button, &window)) {
-            window.setMouseCursorVisible(false);
-            point = true;
-            if (sf::Mouse::isButtonPressed(sf::Mouse::Left) && clock.getElapsedTime().asMilliseconds() > 200) {
-                clock.restart();
-                kku::is_active(&fill_button, !ready[1]);
-                ready[1] = !ready[1];
-            }
-        }
-
-        if (kku::check_border(next_but, &window)) {
-            window.setMouseCursorVisible(false);
-            point = true;
-            if (sf::Mouse::isButtonPressed(sf::Mouse::Left) && clock.getElapsedTime().asMilliseconds() > 300) {
-                clock.restart();
-                if (ready[0] && ready[1]) {
-                    is_warning = false;
-                    create_graphs = true;
-                } else {
-                    is_warning = true;
-                    std::string warn = "";
-                    if (ready[0]) warn = "You didn't chose the kind of filling arrays";
-                    else if (ready[1]) warn = "You didn't chose the kind of sortings";
-                    else warn = "You didn't chose the kinds of sortings and filling arrays";
-                    kku::edit_warning_text(&warning, warn, &font);
-                }
-            }
-        }
-
-
-        if (kku::check_border(cnt_nmax[0], &window)) {
-            window.setMouseCursorVisible(false);
-            point = true;
-            if (nmax > 0 && sf::Mouse::isButtonPressed(sf::Mouse::Left) && clock.getElapsedTime().asMilliseconds() > 100) {
-                clock.restart();
-                nmax --;
-                kku::edit_text(&text_cnt_nmax[1], kku::to_string(nmax), &font);
-            }
-        }
-
-        if (kku::check_border(cnt_nmax[2], &window)) {
-            window.setMouseCursorVisible(false);
-            point = true;
-            if (sf::Mouse::isButtonPressed(sf::Mouse::Left) && clock.getElapsedTime().asMilliseconds() > 100) {
-                clock.restart();
-                nmax ++;
-                kku::edit_text(&text_cnt_nmax[1], kku::to_string(nmax), &font);
-            }
-        }
-
-
-        if (!point) {
-            window.setMouseCursorVisible(true);
-        }
-
-        if (create_graphs) {
-            graph1.create(sf::VideoMode(500, 500), "Dependence of the number of permutations from N");
-            graph2.create(sf::VideoMode(500, 500), "Dependence of the number of comparisons from N");
-            graph2.setPosition(sf::Vector2i(graph1.getPosition().x + 600, graph1.getPosition().y));
-            create_graphs = false;
-
-            kku::rand_array(nmax, array_for_sort);
-            for (int n = 1; n < nmax; n ++) {
-                kku::copy_array(array_for_copy, array_for_sort, n);
-                switch (choose[0]) {
-                    case BUBBLE:
-                        kku::bubble_sort(array_for_copy, permutations, comparisons, n);
-                        perms[n * 2 - 1] = sf::Vertex(sf::Vector2f(kku::Start_x + n * 10, kku::Start_y - permutations[n] * 8));
-                        perms[n * 2] = perms[n * 2 - 1];
-                        comps[n * 2 - 1] = sf::Vertex(sf::Vector2f(kku::Start_x + n * 10, kku::Start_y - comparisons[n] * 8));
-                        comps[n * 2] = comps[n * 2 - 1];
-                        break;
-                    case SELECTION:
-                        kku::selection_sort(array_for_copy, permutations, comparisons, n);
-                        perms[n * 2 - 1] = sf::Vertex(sf::Vector2f(kku::Start_x + n * 10, kku::Start_y - permutations[n] * 8));
-                        perms[n * 2] = perms[n * 2 - 1];
-                        comps[n * 2 - 1] = sf::Vertex(sf::Vector2f(kku::Start_x + n * 10, kku::Start_y - comparisons[n] * 8));
-                        comps[n * 2] = comps[n * 2 - 1];
-                        break;
-                    case HEAP:
-                        kku::heap_sort(array_for_copy, permutations, comparisons, n);
-                        break;
-                    case MERGE:
-                        kku::merge_sort(array_for_copy, permutations, comparisons, n);
-                        break;
-                    default:
-                        kku::edit_warning_text(&warning, "choose[0] is not 0-3", &font);
-                        is_warning = true;
-                        break;
-                }
-            }
-
-
-        }
-
-        window.clear(sf::Color(230, 230, 230));
-        graph1.clear();
-        graph2.clear();
-//        graph1.clear(sf::Color(240, 240, 240));
-//        graph2.clear(sf::Color(240, 240, 240));
-        window.setView(fixed);
-        window.draw(brief);
-        window.draw(choose_sort);
-        for (int i = 0; i < kku::Kinds_sortings; i++) {
-            window.draw(sort_buttons[i]);
-            window.draw(names_of_sortings[i]);
-        }
-        window.draw(input_nmax);
-        for (int i = 0; i < 3; i ++) {
-            window.draw(cnt_nmax[i]);
-            window.draw(text_cnt_nmax[i]);
-        }
-        window.draw(choose_fill);
-        window.draw(fill_button);
-        window.draw(name_random_fill);
-        window.draw(next_but);
-        window.draw(next);
-        graph1.draw(xy, 4, sf::Lines);
-        graph2.draw(xy, 4, sf::Lines);
-        graph1.draw(perms, nmax, sf::Lines);
-        graph1.draw(x_brief);
-        graph2.draw(x_brief);
-        graph1.draw(y1_brief);
-        graph2.draw(y2_brief);
-        graph2.draw(comps, nmax, sf::Lines);
-        if (is_warning)
-            window.draw(warning);
-        if (point)
-            window.draw(pointer);
-        window.display();
-        graph1.display();
-        graph2.display();
     }
+
+    Graph graph1 = {sf::Vector2f(300, 250),
+                    "Dependence of the number of permutations from N", "Num of array's elements", "Num of permutations",
+                    font, 1};
+
+    Graph graph2 = {sf::Vector2f(820, 250),
+                    "Dependence of the number of comparisons from N", "Num of array's elements", "Num of comparisons",
+                    font, 2};
+
+
+    build_app(&window, &warning_window, sort_buttons, fill_buttons, &next_but, ready, choose, &brief, &choose_sort,
+            &choose_fill, &warning, &is_warning, fixed, &graph1, &graph2);
 
     return 0;
 }

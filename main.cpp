@@ -15,6 +15,9 @@ const sf::Color BUT_FILL = sf::Color(245, 245, 245);
 const int OUTLINE_SIZE = 3;
 const int THIN_OUTLINE_SIZE = 2;
 
+const int HEIGHT = sf::VideoMode::getDesktopMode().height;
+const int WIDTH = sf::VideoMode::getDesktopMode().width;
+
 const sf::Color TEXT_COL = sf::Color::Black;
 const sf::Color GRAPH_TEXT_COL = sf::Color::White;
 const sf::Color WARNING_TEXT_COL = sf::Color::Red;
@@ -102,7 +105,7 @@ struct Graph {
 };
 
 void copy_array(int ar1[], int ar2[], int n) {
-    assert(0 < n && n <= NMAX);
+    assert(0 <= n && n <= NMAX);
 
     for (int i = 0; i < n; i++) {
         ar1[i] = ar2[i];
@@ -110,7 +113,7 @@ void copy_array(int ar1[], int ar2[], int n) {
 }
 
 void rand_array(int nmax, int array[]) {
-    assert(0 < nmax && nmax <= NMAX);
+    assert(0 <= nmax && nmax <= NMAX);
 
     for (int i = 0; i < nmax; i++) {
         array[i] = rand();
@@ -118,7 +121,7 @@ void rand_array(int nmax, int array[]) {
 }
 
 void bubble_sort(int array[], int permutations[], int comparisons[], int num_elem) {
-    assert(0 < num_elem && num_elem <= NMAX);
+    assert(0 <= num_elem && num_elem <= NMAX);
 
     int t = -1;
     for (int i = 0; i < num_elem; i++) {
@@ -135,7 +138,7 @@ void bubble_sort(int array[], int permutations[], int comparisons[], int num_ele
 }
 
 void selection_sort(int array[], int permutations[], int comparisons[], int num_elem) {
-    assert(0 < num_elem && num_elem <= NMAX);
+    assert(0 <= num_elem && num_elem <= NMAX);
 
     int mn = array[0], ind_mn = 0;
     for (int i = 0; i < num_elem; i++) {
@@ -189,8 +192,8 @@ bool check_border(const Button& border, sf::RenderWindow *window) {
 
 void Text::draw_text(sf::RenderWindow* window) {
     assert(typeid(write) == typeid(std::string));
-    assert(x >= 0 && x < sf::VideoMode::getDesktopMode().width);
-    assert(y >= 0 && y < sf::VideoMode::getDesktopMode().height);
+    assert(x >= 0 && x < WIDTH);
+    assert(y >= 0 && y < HEIGHT);
     assert(char_size > 10 && char_size < 36);
 
     sf::Text text;
@@ -206,8 +209,8 @@ void Text::draw_text(sf::RenderWindow* window) {
 }
 
 void Button::draw_button(sf::RenderWindow* window) {
-    assert(x >= 0 && x < sf::VideoMode::getDesktopMode().width);
-    assert(y >= 0 && y < sf::VideoMode::getDesktopMode().height);
+    assert(x >= 0 && x < WIDTH);
+    assert(y >= 0 && y < HEIGHT);
 
     sf::RectangleShape shape;
     out = (is_active) ? FUNC_GRAPH_COL[number] : INACT_BUT_CIRCUIT;
@@ -223,8 +226,8 @@ void Button::draw_button(sf::RenderWindow* window) {
 }
 
 void Graph::draw_graph(sf::RenderWindow *window, const bool choose[]) {
-    assert(left_top.x >= 0 && left_top.x < sf::VideoMode::getDesktopMode().width - 301);
-    assert(left_top.y >= 0 && left_top.y < sf::VideoMode::getDesktopMode().height - 402);
+    assert(left_top.x >= 0 && left_top.x < WIDTH - 301);
+    assert(left_top.y >= 0 && left_top.y < HEIGHT - 402);
 
     sf::RectangleShape back;
     back.setPosition(left_top);
@@ -322,7 +325,7 @@ void Graph::build_func_graphs(const bool choose[Kinds_sortings]) {
             points[type][i] = sf::Vector2f(i * 0.1992 + ((number == 1) ? 300 : 820),
                     650 - ((number == 1) ? perms[i] * 0.095 : coms[i] * 0.0002));
 
-            if (i < 120) printf("%i sorting, %i num: %i, %i \n", type, i, perms[i], coms[i]);
+//            if (i < 120) printf("%i sorting, %i num: %i, %i \n", type, i, perms[i], coms[i]);
         }
 
     }
@@ -435,7 +438,7 @@ int main() {
     freopen("../output.out", "w", stdout);
 
     sf::RenderWindow window(
-            sf::VideoMode(sf::VideoMode::getDesktopMode().width, sf::VideoMode::getDesktopMode().height),
+            sf::VideoMode(WIDTH, HEIGHT),
             "Analysis sortings");
     sf::RenderWindow warning_window;
 
@@ -463,9 +466,7 @@ int main() {
 
     Button fill_buttons[1] = {{30, 200, BUT_SIZE, BUT_FILL, OUTLINE_SIZE, RAND_F, font, 0}};
 
-    Button next_but = {static_cast<int>(sf::VideoMode::getDesktopMode().width - 200),
-                       static_cast<int>(sf::VideoMode::getDesktopMode().height - 120),
-                       BUT_SIZE, BUT_FILL, OUTLINE_SIZE, "Start", font, 0};
+    Button next_but = {WIDTH - 200, HEIGHT - 120, BUT_SIZE, BUT_FILL, OUTLINE_SIZE, "Start", font, 0};
 
     Text warning = {50, 40, "", font, WARNING_TEXT_COL, WARNING_TEXT_SIZE};
 

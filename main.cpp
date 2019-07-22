@@ -57,8 +57,6 @@ namespace Settings {
 }
 
 int* copy_of_arr = static_cast<int *>(calloc(Settings::NMax_for_sort, sizeof(int)));
-int* coms = static_cast<int *>(calloc(Settings::NMax_for_sort, sizeof(*coms)));
-int* perms = static_cast<int *>(calloc(Settings::NMax_for_sort, sizeof(*perms)));
 
 // ----- Text ----------------------------------------------------------------------------------------------------------
 
@@ -103,7 +101,7 @@ void Text::draw(sf::RenderWindow *window) {
 
 struct Button {
 
-    void (*func)(int array[], int permutations[], int comparisons[], int num_elem);
+    void (*func)(int array[], int* permutations, int* comparisons, int num_elem);
 
     std::string text;
 
@@ -153,8 +151,6 @@ void Button::draw(sf::RenderWindow *window) {
 
     window->draw(shape);
     fill_text.draw(window);
-
-    printf("%i: %i\n", number, is_active);
 }
 
 void draw_buttons(Button buttons[], int num_of_elems, sf::RenderWindow *window) {
@@ -217,9 +213,9 @@ struct Graph {
 
     sf::Vector2f points[Num_types_sortings][Settings::NMax_for_sort];
 
-    void draw_graph(sf::RenderWindow *window, const bool choose[]);
+    void draw_graph(sf::RenderWindow* window, const bool choose[], int now);
 
-    void build_func_graphs(const bool *choose, Button buttons[]);
+    void build_func_graphs(sf::RenderWindow* window, const bool *choose, Button buttons[]);
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -243,34 +239,34 @@ void rand_array(int nmax, int array[]) {
     }
 }
 
-void empty_sort(int array[], int permutations[], int comparisons[], int num_elem) {
+void empty_sort(int array[], int* permutations, int* comparisons, int num_elem) {
 
 }
 
-void bubble_sort(int array[], int permutations[], int comparisons[], int num_elem) {
+void bubble_sort(int array[], int* permutations, int* comparisons, int num_elem) {
     assert(0 <= num_elem && num_elem <= Settings::NMax_for_arrays);
 
     int t = -1;
     for (int i = 0; i < num_elem; i++) {
         for (int j = i + 1; j < num_elem; j++) {
-            comparisons[num_elem]++;
+            (*comparisons) ++;
             if (array[j] < array[i]) {
                 t = array[j];
                 array[j] = array[i];
                 array[i] = t;
-                permutations[num_elem]++;
+                (*permutations) ++;
             }
         }
     }
 }
 
-void selection_sort(int array[], int permutations[], int comparisons[], int num_elem) {
+void selection_sort(int array[], int* permutations, int* comparisons, int num_elem) {
     assert(0 <= num_elem && num_elem <= Settings::NMax_for_arrays);
 
     int mn = array[0], ind_mn = 0;
     for (int i = 0; i < num_elem; i++) {
         for (int j = i + 1; j < num_elem; j++) {
-            comparisons[num_elem]++;
+            (*comparisons) ++;
             if (array[j] < mn) {
                 mn = array[j];
                 ind_mn = j;
@@ -278,28 +274,28 @@ void selection_sort(int array[], int permutations[], int comparisons[], int num_
         }
         array[ind_mn] = array[i];
         array[i] = mn;
-        permutations[num_elem]++;
+        (*permutations) ++;
     }
 
 }
 
-void heap_sort(int array[], int permutations[], int comparisons[], int num_elem) {
+void heap_sort(int array[], int* permutations, int* comparisons, int num_elem) {
 
 }
 
-void insertion_sort(int array[], int *permutations, int *comparisons, int num_elem) {
+void insertion_sort(int array[], int* permutations, int* comparisons, int num_elem) {
     int key = 0;
     int i = 0;
     for (int j = 1; j < num_elem; j++) {
         key = array[j];
         i = j - 1;
-        if (!(i >= 0 && array[i] > key)) comparisons[num_elem] ++;
+        if (!(i >= 0 && array[i] > key)) (*comparisons) ++;
         while (i >= 0 && array[i] > key) {
             array[i + 1] = array[i];
             i = i - 1;
             array[i + 1] = key;
-            comparisons[num_elem] ++;
-            permutations[num_elem] ++;
+            (*comparisons) ++;
+            (*permutations) ++;
         }
     }
 }
@@ -331,27 +327,42 @@ bool check_border(const Button &border, sf::RenderWindow *window) {
 //}
 
 
-void Graph::draw_graph(sf::RenderWindow *window, const bool choose[]) {
+bool is_clicked(sf::Clock clock) {
+    return (sf::Mouse::isButtonPressed(sf::Mouse::Left) && clock.getElapsedTime().asMilliseconds() > 200);
+}
+
+//void Cursor::show(sf::RenderWindow *window) {
+//    window->setMouseCursorVisible(!is_pointer);
+void window_update(sf::RenderWindow *window, sf::RenderWindow *warning_window, Button sort_buttons[], Button fill_buttons[],
+                   Button *next_but,
+                   int ready[], bool choose[][Num_types_sortings],
+                   Text *brief, Text *choose_sort, Text *choose_fill, Text *warning, bool *is_warning, sf::View fixed,
+                   Graph *graph1, Graph *graph2, bool is_necessary, sf::Clock clock) {
+
+}
+
+void Graph::draw_graph(sf::RenderWindow *window, const bool choose[], int now) {
     assert(left_top.x >= 0 && left_top.x < Settings::Width - 301);
     assert(left_top.y >= 0 && left_top.y < Settings::Height - 402);
+    assert(now < Settings::NMax_for_sort);
 
     sf::RectangleShape back;
     back.setPosition(left_top);
     back.setSize(sf::Vector2f(301, 402));
 
-    Text zero = {{left_top.x - 12, left_top.y + 405}, "0", font, Settings::Text_col, Settings::Num_size},
-            xmax = {{left_top.x + 290, left_top.y + 405}, "1500", font, Settings::Text_col, Settings::Num_size},
-            ymax = {{left_top.x - ((number == 1) ? 40 : 65), left_top.y}, (number == 1) ? "4210" : "2000000",
+    Text zero = {{left_top.x - 12,  left_top.y + 405}, "0",    font, Settings::Text_col, Settings::Num_size},
+         xmax = {{left_top.x + 290, left_top.y + 405}, "1500", font, Settings::Text_col, Settings::Num_size},
+         ymax = {{left_top.x - ((number == 1) ? 50 : 75), left_top.y},       (number == 1) ? "4210" : "2000000",
                     font, Settings::Text_col, Settings::Text_size},
-            xmid = {{left_top.x + 145, left_top.y + 405}, "750", font, Settings::Text_col, Settings::Num_size},
-            ymid = {{left_top.x - ((number == 1) ? 40 : 65), left_top.y + 200}, (number == 1) ? "2105" : "1000000",
+         xmid = {{left_top.x + 145, left_top.y + 405},  "750", font, Settings::Text_col, Settings::Num_size},
+         ymid = {{left_top.x - ((number == 1) ? 50 : 75), left_top.y + 200}, (number == 1) ? "2105" : "1000000",
                     font, Settings::Text_col, Settings::Text_size};
 
     back.setFillColor(Settings::Graph_backgrnd);
 
-    Text title_text = {{left_top.x - 50, left_top.y - 40}, title, font, Settings::Text_col, Settings::Text_size},
-            xlab_text = {{left_top.x + 50, left_top.y + 420}, xlab, font, Settings::Text_col, Settings::Text_size},
-            ylab_text = {{left_top.x - 90, left_top.y + 280}, ylab, font, Settings::Text_col, Settings::Text_size, -90};
+    Text title_text = {{left_top.x - 50,  left_top.y - 40}, title, font, Settings::Text_col, Settings::Text_size},
+          xlab_text = {{left_top.x + 50,  left_top.y + 420}, xlab, font, Settings::Text_col, Settings::Text_size},
+          ylab_text = {{left_top.x - 100, left_top.y + 280}, ylab, font, Settings::Text_col, Settings::Text_size, -90};
 
     window->draw(back);
     title_text.draw(window);
@@ -363,58 +374,59 @@ void Graph::draw_graph(sf::RenderWindow *window, const bool choose[]) {
     xmid.draw(window);
     ymid.draw(window);
 
+
+//    if (now < Settings::NMax_for_sort - 5) {
+//        for (int i = 0; i <= now; i ++) {
+//            printf("x: %f, y: %f" "\t", points[0][i].x, points[0][i].y);
+//        }
+//        printf("\n");
+//    }
+
     sf::CircleShape circleShape;
 
     for (int type = 0; type < Num_types_sortings; type++) {
-        for (auto point : points[type]) {
-            if (!choose[type] || point.x >= left_top.x + 300 || point.y <= left_top.y) continue;
+        for (int n = 0; n < now; n ++) {
+            if (!choose[type] || points[type][n].x >= left_top.x + 300 || points[type][n].y <= left_top.y) continue;
             circleShape.setRadius(1);
-            circleShape.setPosition(point);
+            circleShape.setPosition(points[type][n]);
             circleShape.setFillColor(Settings::Func_graph_color[type]);
             window->draw(circleShape);
         }
     }
 }
 
-bool is_clicked(sf::Clock clock) {
-    return (sf::Mouse::isButtonPressed(sf::Mouse::Left) && clock.getElapsedTime().asMilliseconds() > 200);
-}
-
-//void Cursor::show(sf::RenderWindow *window) {
-//    window->setMouseCursorVisible(!is_pointer);
 //}
 
-void Graph::build_func_graphs(const bool choose[Num_types_sortings], Button buttons[]) {
+void Graph::build_func_graphs(sf::RenderWindow* window, const bool choose[Num_types_sortings], Button buttons[]) {
     int arr[Settings::NMax_for_sort] = {};
     rand_array(Settings::NMax_for_sort, arr);
+    int coms = 0, perms = 0;
 
 //    int copy_of_arr[Settings::NMax_for_sort] = {};
 
-    for (int type = 0; type < Num_types_sortings; type++) {
-        if (!choose[type]) continue;
-        memset(coms, 0, sizeof(*coms) * Settings::NMax_for_sort);
-        memset(perms, 0, sizeof(*coms) * Settings::NMax_for_sort);
+    for (int n = 0; n < Settings::NMax_for_sort; n ++) {
+        for (int type = 0; type < Num_types_sortings; type ++) {
+            if (!choose[type]) continue;
 
-        for (int n = 0; n < Settings::NMax_for_sort; n++) {
+            coms = 0;
+            perms = 0;
+
             copy_array(copy_of_arr, arr, n);
-            buttons[type].func(copy_of_arr, perms, coms, n);
-        }
-        for (int i = 0; i < Settings::NMax_for_sort; i++) {
-            points[type][i] = sf::Vector2f(i * 0.1992 + ((number == 1) ? 300 : 820),
-                                           650 - ((number == 1) ? perms[i] * 0.095 : coms[i] * 0.0002));
+            buttons[type].func(copy_of_arr, &perms, &coms, n);
 
-//            if (i < 120) printf("%i sorting, %i num: %i, %i \n", type, i, perms[i], coms[i]);
-        }
+            points[type][n] = sf::Vector2f(n * 0.1992 + ((number == 1) ? 300 : 820),
+                                           650 - ((number == 1) ? perms * 0.095 : coms * 0.0002));
 
+        }
     }
 }
 
+
 void destroy_from_building_funcs() {
     free(copy_of_arr);
-    free(coms);
-    free(perms);
 
 }
+
 
 void build_app(sf::RenderWindow *window, sf::RenderWindow *warning_window, Button sort_buttons[], Button fill_buttons[],
                Button *next_but,
@@ -471,8 +483,8 @@ void build_app(sf::RenderWindow *window, sf::RenderWindow *warning_window, Butto
                 clock.restart();
                 if (ready[0] && ready[1]) {
                     *is_warning = false;
-                    graph1->build_func_graphs(choose[0], sort_buttons);
-                    graph2->build_func_graphs(choose[0], sort_buttons);
+                    graph1->build_func_graphs(window, choose[0], sort_buttons);
+                    graph2->build_func_graphs(window, choose[0], sort_buttons);
                 } else {
                     *is_warning = true;
                     is_necessary = true;
@@ -502,8 +514,8 @@ void build_app(sf::RenderWindow *window, sf::RenderWindow *warning_window, Butto
 
         next_but->draw(window);
 
-        graph1->draw_graph(window, choose[0]);
-        graph2->draw_graph(window, choose[0]);
+        graph1->draw_graph(window, choose[0], Settings::NMax_for_sort - 1);
+        graph2->draw_graph(window, choose[0], Settings::NMax_for_sort - 1);
 
 //        if (cursor->is_pointer)
 //            window->draw(cursor->form);

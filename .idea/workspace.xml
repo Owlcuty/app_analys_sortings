@@ -12,10 +12,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="3282a685-4144-44e9-b15a-89dcf9c7e853" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/CMakeFiles/SFMLApp.dir/main.cpp.o" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/SFMLApp" beforeDir="false" afterPath="$PROJECT_DIR$/SFMLApp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/main.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/output.out" beforeDir="false" afterPath="$PROJECT_DIR$/output.out" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/cmake-build-debug/" />
     <ignored path="$PROJECT_DIR$/cmake-build-default/" />
@@ -48,8 +47,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/main.cpp">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="205">
-              <caret line="242" column="71" lean-forward="true" selection-start-line="242" selection-start-column="71" selection-end-line="242" selection-end-column="71" />
+            <state relative-caret-position="255">
+              <caret line="662" column="76" selection-start-line="662" selection-start-column="76" selection-end-line="662" selection-end-column="76" />
               <folding>
                 <element signature="e#0#18#0" expanded="true" />
               </folding>
@@ -59,7 +58,11 @@
       </file>
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/output.out">
-          <provider selected="true" editor-type-id="text-editor" />
+          <provider selected="true" editor-type-id="text-editor">
+            <state>
+              <caret column="1" lean-forward="true" selection-start-column="1" selection-end-column="1" />
+            </state>
+          </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
@@ -75,27 +78,10 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>build_app</find>
-      <find>draw_g</find>
-      <find>Graph::dra</find>
-      <find>void dra</find>
-      <find>build_func_</find>
-      <find>graph1-&gt;</find>
-      <find>clear</find>
-      <find>next_but</find>
-      <find>choose</find>
-      <find>int* no</find>
-      <find>threa</find>
-      <find>window_upd</find>
-      <find>window_up</find>
-      <find>gr</find>
-      <find>Graph::draw</find>
-      <find>freop</find>
       <find>build_fu</find>
       <find>window_u</find>
       <find>window_</find>
       <find>func(</find>
-      <find>free</find>
       <find>window-&gt;draw</find>
       <find>build_f</find>
       <find>draw(</find>
@@ -105,6 +91,23 @@
       <find>insert</find>
       <find>* 0.00</find>
       <find>20000</find>
+      <find>array</find>
+      <find>free</find>
+      <find>is_cl</find>
+      <find>build_app</find>
+      <find>ready[0] &amp;&amp;</find>
+      <find>printf</find>
+      <find>__TI</find>
+      <find>wait_str</find>
+      <find>Text::dr</find>
+      <find>wait_st</find>
+      <find>next_bt</find>
+      <find>wait_</find>
+      <find>to_</find>
+      <find>time_fo</find>
+      <find>time_of</find>
+      <find>used</find>
+      <find>time_</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -180,12 +183,12 @@
       <workItem from="1563494274957" duration="74520000" />
       <workItem from="1563652756301" duration="22415000" />
       <workItem from="1563813044930" duration="19056000" />
-      <workItem from="1563899070088" duration="990000" />
+      <workItem from="1563899070088" duration="3946000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="116981000" />
+    <option name="totallyTimeSpent" value="119937000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -339,9 +342,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/output.out">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
     <entry file="file://$PROJECT_DIR$/cmake-build-default/Makefile">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1755">
@@ -349,10 +349,17 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/output.out">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <caret column="1" lean-forward="true" selection-start-column="1" selection-end-column="1" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/main.cpp">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="205">
-          <caret line="242" column="71" lean-forward="true" selection-start-line="242" selection-start-column="71" selection-end-line="242" selection-end-column="71" />
+        <state relative-caret-position="255">
+          <caret line="662" column="76" selection-start-line="662" selection-start-column="76" selection-end-line="662" selection-end-column="76" />
           <folding>
             <element signature="e#0#18#0" expanded="true" />
           </folding>

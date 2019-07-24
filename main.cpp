@@ -59,6 +59,7 @@ namespace Settings {
 int* copy_of_arr = static_cast<int *>(calloc(Settings::NMax_for_sort, sizeof(*copy_of_arr)));
 bool* used_sortings1 = static_cast<bool *>(calloc(Settings::NMax_for_sort, sizeof(*used_sortings1)));
 bool* used_sortings2 = static_cast<bool *>(calloc(Settings::NMax_for_sort, sizeof(*used_sortings2)));
+int* array_for_sorting = static_cast<int *>(calloc(Settings::NMax_for_sort, sizeof(*array_for_sorting)));
 
 void rand_array(int nmax, int array[]);
 void copy_array(int ar1[], const int ar2[], int n);
@@ -284,8 +285,7 @@ void Graph::draw(sf::RenderWindow *window, const bool *choose, int now) {
 //}
 
 void Graph::build_func_graphs(const bool choose[Num_types_sortings], Button buttons[]) {
-    int arr[Settings::NMax_for_sort] = {};
-    rand_array(Settings::NMax_for_sort, arr);
+    rand_array(Settings::NMax_for_sort, array_for_sorting);
     int coms = 0, perms = 0;
 
 //    int copy_of_arr[Settings::NMax_for_sort] = {};
@@ -297,7 +297,7 @@ void Graph::build_func_graphs(const bool choose[Num_types_sortings], Button butt
             coms = 0;
             perms = 0;
 
-            copy_array(copy_of_arr, arr, n);
+            copy_array(copy_of_arr, array_for_sorting, n);
             buttons[type].func(copy_of_arr, &perms, &coms, n);
 
             points[type][n] = sf::Vector2f(n * 0.1992 + ((number == 1) ? 300 : 820),
@@ -313,6 +313,7 @@ void destroy_from_building_funcs() {
     free(copy_of_arr);
     free(used_sortings1);
     free(used_sortings2);
+    free(array_for_sorting);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -408,10 +409,10 @@ void build_heap(int array[], int num_elem, int* permutations, int* comparisons) 
         heapify(array, i, 0, permutations, comparisons);
     }
 
-    for (int i = 0; i < num_elem; i ++) {
-        printf("%i ", array[i]);
-        if (i == num_elem - 1) printf("\n");
-    }
+//    for (int i = 0; i < num_elem; i ++) {
+//        printf("%i ", array[i]);
+//        if (i == num_elem - 1) printf("\n");
+//    }
 }
 
 void heap_sort(int array[], int* permutations, int* comparisons, int num_elem) {
@@ -483,9 +484,11 @@ void build_app(sf::RenderWindow *window, sf::RenderWindow *warning_window, Butto
                Button *next_but,
                int ready[], bool choose[][Num_types_sortings],
                Text *brief, Text *choose_sort, Text *choose_fill, Text *warning, bool *is_warning, sf::View fixed,
-               Graph *graph1, Graph *graph2) {
+               Graph *graph1, Graph *graph2, Text* wait_str) {
     sf::Clock clock;
     bool is_necessary = true;
+    int time_of_sort = 0;
+    int times_sorts[] = {0, 5, 3, 1, 3};
 
     while (window->isOpen()) {
         sf::Event event{};
@@ -528,14 +531,24 @@ void build_app(sf::RenderWindow *window, sf::RenderWindow *warning_window, Butto
             }
         }
 
+        time_of_sort = 0;
+
         if (check_border(*next_but, window)) {
 //            cursor->is_pointer = true;
             if (is_clicked(clock)) {
                 clock.restart();
                 if (ready[0] && ready[1]) {
                     *is_warning = false;
+                    for (int i = 1; i < Num_types_sortings; i ++) {
+                        time_of_sort += (!used_sortings1[i]) * choose[0][i] * times_sorts[i];
+                    }
+                    wait_str->str = "Please, wait about " + std::to_string(time_of_sort) + " sec";
+                    wait_str->draw(window);
+                    window->display();
+                    printf("%d" "\n", clock.getElapsedTime().asMilliseconds());
                     graph1->build_func_graphs(choose[0], sort_buttons);
                     graph2->build_func_graphs(choose[0], sort_buttons);
+                    printf("%d" "\n", clock.getElapsedTime().asMilliseconds());
                 } else {
                     *is_warning = true;
                     is_necessary = true;
@@ -647,8 +660,12 @@ int main() {
                     font, 2};
 
 
-    build_app(&window, &warning_window, sort_buttons, fill_buttons, &next_btn, ready, choose, &brief, &choose_sort,
-              &choose_fill, &warning, &is_warning, fixed, &graph1, &graph2);
+    Text wait_str = {{20, Settings::Height - 120}, "Please, wait about n sec", font, Settings::Warning_text_color,
+                     Settings::Warning_text_size};
 
+    build_app(&window, &warning_window, sort_buttons, fill_buttons, &next_btn, ready, choose, &brief, &choose_sort,
+              &choose_fill, &warning, &is_warning, fixed, &graph1, &graph2, &wait_str);
+
+    fclose(stdout);
     return 0;
 }

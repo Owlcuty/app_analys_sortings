@@ -54,6 +54,7 @@ namespace Settings {
 
     const Size Btn_size = {160, 30};
 
+    const int times_sorts[] = {0, 5, 3, 1, 3};
 }
 
 int* copy_of_arr = static_cast<int *>(calloc(Settings::NMax_for_sort, sizeof(*copy_of_arr)));
@@ -488,7 +489,6 @@ void build_app(sf::RenderWindow *window, sf::RenderWindow *warning_window, Butto
     sf::Clock clock;
     bool is_necessary = true;
     int time_of_sort = 0;
-    int times_sorts[] = {0, 5, 3, 1, 3};
 
     while (window->isOpen()) {
         sf::Event event{};
@@ -540,7 +540,7 @@ void build_app(sf::RenderWindow *window, sf::RenderWindow *warning_window, Butto
                 if (ready[0] && ready[1]) {
                     *is_warning = false;
                     for (int i = 1; i < Num_types_sortings; i ++) {
-                        time_of_sort += (!used_sortings1[i]) * choose[0][i] * times_sorts[i];
+                        time_of_sort += (!used_sortings1[i]) * choose[0][i] * Settings::times_sorts[i];
                     }
                     wait_str->str = "Please, wait about " + std::to_string(time_of_sort) + " sec";
                     wait_str->draw(window);

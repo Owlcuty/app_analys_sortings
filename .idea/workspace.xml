@@ -12,9 +12,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="3282a685-4144-44e9-b15a-89dcf9c7e853" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/SFMLApp" beforeDir="false" afterPath="$PROJECT_DIR$/SFMLApp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/main.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/output.out" beforeDir="false" afterPath="$PROJECT_DIR$/output.out" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/cmake-build-debug/" />
     <ignored path="$PROJECT_DIR$/cmake-build-default/" />
@@ -47,8 +45,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/main.cpp">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="255">
-              <caret line="662" column="76" selection-start-line="662" selection-start-column="76" selection-end-line="662" selection-end-column="76" />
+            <state relative-caret-position="170">
+              <caret line="543" column="21" lean-forward="true" selection-start-line="543" selection-start-column="21" selection-end-line="543" selection-end-column="21" />
               <folding>
                 <element signature="e#0#18#0" expanded="true" />
               </folding>
@@ -183,12 +181,12 @@
       <workItem from="1563494274957" duration="74520000" />
       <workItem from="1563652756301" duration="22415000" />
       <workItem from="1563813044930" duration="19056000" />
-      <workItem from="1563899070088" duration="3946000" />
+      <workItem from="1563899070088" duration="4049000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="119937000" />
+    <option name="totallyTimeSpent" value="120040000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -358,8 +356,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/main.cpp">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="255">
-          <caret line="662" column="76" selection-start-line="662" selection-start-column="76" selection-end-line="662" selection-end-column="76" />
+        <state relative-caret-position="170">
+          <caret line="543" column="21" lean-forward="true" selection-start-line="543" selection-start-column="21" selection-end-line="543" selection-end-column="21" />
           <folding>
             <element signature="e#0#18#0" expanded="true" />
           </folding>
